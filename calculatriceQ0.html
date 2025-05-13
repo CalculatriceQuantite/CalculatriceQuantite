@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculatrice Comparative</title>
+</head>
+<body>
+    <h2>Calculatrice Comparative</h2>
+
+    <label for="premier">Premier calcul :</label><br>
+    <input type="text" id="premier" placeholder="Ex: 2+3*4"><br><br>
+
+    <label for="deuxieme">Deuxième calcul :</label><br>
+    <input type="text" id="deuxieme" placeholder="Ex: 10/2+1"><br><br>
+
+    <button onclick="calcule()">Calculer et comparer</button>
+
+    <h3>Résultats</h3>
+    <pre id="resultat"></pre>
+
+    <script>
+        function evalExpression(expr) {
+            try {
+                // Utilisation sécurisée de eval
+                return Function('"use strict";return (' + expr + ')')();
+            } catch (e) {
+                throw new Error("Expression invalide : " + expr);
+            }
+        }
+
+        function ecrireFichier(nom, contenu) {
+            localStorage.setItem(nom, contenu);
+        }
+
+        function lireFichier(nom) {
+            return localStorage.getItem(nom);
+        }
+
+        function calcule() {
+            try {
+                const resElem = document.getElementById("resultat");
+                resElem.textContent = ""; // Reset
+
+                const premierExpr = document.getElementById("premier").value;
+                const premierResult = evalExpression(premierExpr);
+                ecrireFichier("CalculatriceMemoire0", premierResult);
+                resElem.textContent += `Résultat premier : ${premierResult}\n`;
+
+                const premierLu = parseFloat(lireFichier("CalculatriceMemoire0"));
+
+                const deuxiemeExpr = document.getElementById("deuxieme").value;
+                const deuxiemeResult = evalExpression(deuxiemeExpr);
+                ecrireFichier("CalculatriceMemoire1", deuxiemeResult);
+                resElem.textContent += `Résultat deuxième : ${deuxiemeResult}\n`;
+
+                const deuxiemeLu = parseFloat(lireFichier("CalculatriceMemoire1"));
+
+                // Comparaison
+                if (premierLu === deuxiemeLu) {
+                    resElem.textContent += "Égalité parfaite\n";
+                } else if (premierLu < deuxiemeLu) {
+                    resElem.textContent += "Le premier est inférieur au deuxième\n";
+                } else if (premierLu > deuxiemeLu) {
+                    resElem.textContent += "Le premier est supérieur au deuxième\n";
+                } else {
+                    resElem.textContent += "Erreur de comparaison\n";
+                }
+
+                resElem.textContent += `Valeurs : ${premierLu} et ${deuxiemeLu}`;
+
+            } catch (e) {
+                alert("Erreur : " + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
